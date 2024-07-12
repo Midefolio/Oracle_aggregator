@@ -31,21 +31,21 @@ Make sure you have the following installed:
 
 2. Install the dependencies:
 
-    ```bash
+```bash
     npm install
     # or
     yarn install
-    ```
+```
 
 
 # Running the Application
 To start the development server:
 
-    ```bash
+```bash
     npm run dev
-      # or  
+    # or  
    yarn dev
-    ```
+```
 
 # Deployment
 Deploying to Vercel
