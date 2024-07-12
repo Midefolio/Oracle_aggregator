@@ -107,7 +107,7 @@ wrangler pages publish build
 
 ## Components
 
-1. # Switch AssectsType Component
+1. Switch AssectsType Component
 
 The AssectsType component enables for easy selection of assets type (Crypto and Fx assests).
 
@@ -156,7 +156,7 @@ const Aggregator = () => {
 export default Aggregator;
 ```
 
-2. # SearchBar Component
+2. SearchBar Component
 
 The SearchBar component provides a dropdown for selecting an asset. It uses virtualization to handle large datasets efficiently.
 
@@ -214,7 +214,7 @@ export default SearchBar;
 ```
 
 
-3. # Result Component
+3. Result Component
 
 The Result component fetches price data from Pyth Network and Chainlink, aggregates the prices, and displays the result.
 
@@ -349,3 +349,13 @@ const Result = () => {
 export default Result;
 
 ```
+
+
+# Contributing
+If you'd like to contribute, please fork the repository and use a feature branch. Pull requests are warmly welcome.
+
+# License
+This project is licensed under the MIT License.
+
+# Contact
+If you have any questions or need further assistance, please contact [ayomidebabatundeolosho@gmail.com].
