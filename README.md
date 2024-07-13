@@ -48,7 +48,8 @@ yarn dev
 ```
 
 # Deployment
-Deploying to Vercel
+
+# Deploying to Vercel
 
 1. Install the Vercel CLI:
 
