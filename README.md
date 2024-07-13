@@ -1,11 +1,11 @@
 # Oracle Aggregator
-This Oracle Aggregator is a React-based application that fetches and aggregates price feeds from multiple oracle sources, such as Pyth Network and Chainlink. The aggregated price is then displayed on the frontend. This project can be deployed on platforms like Cloudflare or Vercel for seamless integration and hosting.
+This Oracle Aggregator is a React-based application that fetches and aggregates price feeds from multiple oracle sources, such as Pyth Network, Chainlink and DiaData. The aggregated price is then displayed on the frontend. This project can be deployed on platforms like Cloudflare or Vercel for seamless integration and hosting.
 
 
 # Features
 
-- Fetches price feeds from Pyth Network and Chainlink.
-- Aggregates the price feeds using weighted averages.
+- Fetches price feeds from Pyth Network, Chainlink and DiaData.
+- Aggregates the price feeds.
 - Displays the aggregated price along with the sources used for computation.
 - Includes error handling and loading states for better user experience.
 - Refreshes the data every minute to ensure up-to-date information.
@@ -24,10 +24,10 @@ Make sure you have the following installed:
 
 1. Clone the repository:
 
-    ```bash
-    git clone https://github.com/your-username/oracle-aggregator.git
-    cd oracle-aggregator
-    ```
+```bash
+git clone https://github.com/your-username/oracle-aggregator.git
+cd oracle-aggregator
+```
 
 2. Install the dependencies:
 
@@ -42,9 +42,9 @@ Make sure you have the following installed:
 To start the development server:
 
 ```bash
-    npm run dev
-    # or  
-   yarn dev
+npm run dev
+# or  
+yarn dev
 ```
 
 # Deployment
@@ -52,14 +52,14 @@ Deploying to Vercel
 
 1. Install the Vercel CLI:
 
-    ```bash
-    npm install -g vercel
-    ```
+```bash
+npm install -g vercel
+```
 
 2. Deploy the application:
 
 ```bash
-    vercel
+vercel
 ```
 
 Follow the prompts to link or create a new Vercel project. Your application will be deployed and you will receive a URL for your live application.
@@ -69,14 +69,14 @@ Follow the prompts to link or create a new Vercel project. Your application will
 1. Install the Cloudflare CLI:
 
 ```bash
-    npm install -g wrangler
+npm install -g wrangler
 ```
 
 2. Authenticate with Cloudflare:
 
 
 ```bash
- wrangler login
+wrangler login
 ```
 
 
@@ -219,23 +219,23 @@ export default SearchBar;
 The Result component fetches price data from Pyth Network and Chainlink, aggregates the prices, and displays the result.
 
 ```jsx
-import React, { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useApi from "../hook/useApi";
 import { UtilsContext } from "../context/utilsContext";
 import useUtils from "../utils/useutils";
 import CustomSkeleton from "./skeleton";
 import ErrorModal from "./errorModal";
+import axios from 'axios';
 
 const Result = () => {
-  const { makeRequest } = useApi();
   const { selected } = useContext(UtilsContext);
   const [aggregatedPrice, setAggregatedPrice] = useState(null);
   const [image, setImage] = useState(null);
-  const { formatNumber } = useUtils();
-  const [isFetching, setIsFetching] = useState(false);
-  const [symbol, setSymbol] = useState(null);
-  const [computedFrom, setComputedFrom] = useState([]);
-  const [error, setError] = useState(false);
+  const { formatNumber } = useUtils()
+  const [isfetching, setIsFetching] = useState(true)
+  const [symbol, setSymbol] = useState(null)
+  const [computedFrom, setComputedFrom] = useState([])
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     if (selected) {
@@ -243,76 +243,91 @@ const Result = () => {
     }
   }, [selected]);
 
-  const normalizePythPrice = (price, expo) => {
-    return parseFloat(price) * 10 ** expo;
-  };
-
-  const aggregatePrices = async (allowSkeleton) => {
-    setComputedFrom([]);
-    setIsFetching(allowSkeleton);
-
-    const pythUrl = `https://hermes.pyth.network/v2/updates/price/latest?ids[]=${selected?.id}&encoding=hex`;
+  const getPriceFeedHandler = async () => {
+    // Endpoints defined: fetching from Pyth, ChainLink, and Diadata oracles
+    const pythURl = `https://hermes.pyth.network/v2/updates/price/latest?ids%5B%5D=${selected?.id}&encoding=hex`;
     const chainLinkUrl = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${selected?.fsyms}&tsyms=${selected?.tsyms}`;
-
+    const diaDataUrl = `https://api.diadata.org/v1/quotation/${selected?.fsyms}`;
+    setIsFetching(true)
+    
     try {
-      const pythData = await makeRequest('get', pythUrl);
-      const chainLinkData = await makeRequest('get', chainLinkUrl);
+      const results = await Promise.allSettled([
+        axios.get(pythURl),
+        axios.get(chainLinkUrl),
+        axios.get(diaDataUrl)
+      ]);
 
-      if (!pythData?.parsed && !chainLinkData?.RAW) {
+      const pythResult = results[0];
+      const chainLinkResult = results[1];
+      const diaResult = results[2];
+
+      if (pythResult.status !== 'fulfilled' && chainLinkResult.status !== 'fulfilled') {
         setError(true);
-        setAggregatedPrice(null);
-        setIsFetching(false);
-        return;
+        return
       }
 
-      let pythPrice, pythConf, chainLinkPrice;
-      let pythWeight = 0, chainLinkWeight = 0, totalWeight = 0;
-      let aggregatedPrice = 0;
+      let pythPrice = null;
+      let chainLinkPrice = null;
+      let diaPrice = null;
+      let count = 0;
+      let totalPrice = 0;
+      let computedFrom = [];
 
-      if (pythData?.parsed) {
-        pythPrice = normalizePythPrice(pythData.parsed[0].price.price, pythData.parsed[0].price.expo);
-        pythConf = normalizePythPrice(pythData.parsed[0].price.conf, pythData.parsed[0].price.expo);
-        pythWeight = 1 / pythConf;
-        setComputedFrom(prev => [...prev, "Pyth Network Oracle"]);
+      // Extract Pyth price feed
+      if (pythResult.status === 'fulfilled' && pythResult.value.data.parsed) {
+        const priceData = pythResult.value.data.parsed[0].price;
+        pythPrice = parseFloat(priceData.price) * Math.pow(10, priceData.expo);
+        totalPrice += pythPrice;
+        count++;
+        computedFrom.push("Pyth Network");
       }
 
-      if (chainLinkData?.RAW) {
-        chainLinkPrice = chainLinkData['RAW'][selected?.fsyms][selected?.tsyms]['PRICE'];
-        chainLinkWeight = 1;
-        setImage('https://www.cryptocompare.com/' + chainLinkData['RAW'][selected?.fsyms][selected?.tsyms]['IMAGEURL']);
-        setComputedFrom(prev => [...prev, "Chainlink Oracle"]);
+      // Extract ChainLink price feed
+      if (chainLinkResult.status === 'fulfilled' && chainLinkResult.value.data.RAW) {
+        chainLinkPrice = chainLinkResult.value.data.RAW[selected.fsyms][selected.tsyms].PRICE;
+        totalPrice += chainLinkPrice;
+        count++;
+        computedFrom.push("Chainlink");
+        setImage('https://www.cryptocompare.com/' + chainLinkResult.value.data.RAW[selected?.fsyms][selected?.tsyms]['IMAGEURL']);
       }
 
-      totalWeight = pythWeight + chainLinkWeight;
-
-      if (pythWeight > 0) {
-        aggregatedPrice += (pythPrice * pythWeight);
+      // Extract Diadata.org price
+      if (diaResult.status === 'fulfilled' && diaResult.value.data.Price) {
+        diaPrice = parseFloat(diaResult.value.data.Price);
+        totalPrice += diaPrice;
+        count++;
+        computedFrom.push("Diadata");
       }
 
-      if (chainLinkWeight > 0) {
-        aggregatedPrice += (chainLinkPrice * chainLinkWeight);
+      if (count < 1) {
+        setError(true)
+        return
       }
 
-      aggregatedPrice /= totalWeight;
+      // Compute the average price
+      const averagePrice = totalPrice / count;
+      setAggregatedPrice(averagePrice);
+      setComputedFrom(computedFrom);
+      setIsFetching(false)
 
-      setAggregatedPrice(aggregatedPrice);
-      setIsFetching(false);
     } catch (error) {
-      console.log("Error fetching data:", error);
+      setError(true);
     }
   };
 
   useEffect(() => {
     if (selected) {
-      aggregatePrices(true);
-      const interval = setInterval(() => { aggregatePrices(false) }, 60000);
+      getPriceFeedHandler();
+      const interval = setInterval(() => {
+        getPriceFeedHandler();
+      }, 60000); // Fetch data every minute
       return () => clearInterval(interval);
     }
   }, [selected]);
 
   return (
     <>
-      {isFetching ? <CustomSkeleton /> : (
+      {isfetching ? <CustomSkeleton /> : (
         <div className="my-mother">
           {error && <ErrorModal />}
           {image && (
@@ -325,16 +340,17 @@ const Result = () => {
           {aggregatedPrice && (
             <div className="my-col-8 down-2">
               <div className="my-mother down-">
-                <span className="px20 InterSemiBold rad-30">{selected?.label}</span>
+                <span className="px20 InterSemiBol rad-30">{selected?.label}</span>
               </div>
               <div className="my-mother down-3">
                 <span className="px50 InterSemiBold">
-                  <span>{symbol === 'USD' ? '$' : symbol}</span> {formatNumber(aggregatedPrice)}
+                  <span>{`${symbol}` === 'USD' ? <span>$</span> : <span>{symbol}</span>} </span>
+                  {formatNumber(aggregatedPrice)}
                 </span>
               </div>
               <div className="my-mother down-3 xs-down-1 px10">
-                <span>Price computed from</span>
-                <span>{computedFrom?.slice(0, 2).map((i, index) => (
+                <span>Price computed from </span>
+                <span>{computedFrom.slice(0, 3).map((i, index) => (
                   <span className="pd-5 bg-faded InterSemiBold rad-30 mg-10" key={index}>{i}</span>
                 ))}</span>
               </div>
@@ -347,7 +363,6 @@ const Result = () => {
 };
 
 export default Result;
-
 ```
 
 
