@@ -102,7 +102,7 @@ wrangler pages publish build
 # Usage
 
 - Select an asset from the dropdown to view its aggregated price.
-- The application will fetch price feeds from Pyth Network and Chainlink, aggregate them, and display the result.
+- The application will fetch price feeds from Pyth Network, chainlink and Diadata, aggregate them, and display the result.
 - The price is refreshed every minute to ensure accuracy.
 
 
