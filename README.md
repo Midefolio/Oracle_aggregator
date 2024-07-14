@@ -10,6 +10,10 @@ This Oracle Aggregator is a React-based application that fetches and aggregates 
 - Includes error handling and loading states for better user experience.
 - Refreshes the data every minute to ensure up-to-date information.
 
+# See Demo
+
+- Site link - https://oracle-aggregator.netlify.app
+- Video demo - https://youtube.com/76765454
 
 ## Getting Started
 
@@ -32,9 +36,9 @@ cd oracle-aggregator
 2. Install the dependencies:
 
 ```bash
-    npm install
-    # or
-    yarn install
+npm install
+# or
+yarn install
 ```
 
 
@@ -243,12 +247,12 @@ const Result = () => {
     }
   }, [selected]);
 
-  const getPriceFeedHandler = async () => {
+  const getPriceFeedHandler = async (shouldLoad) => {
     // Endpoints defined: fetching from Pyth, ChainLink, and Diadata oracles
     const pythURl = `https://hermes.pyth.network/v2/updates/price/latest?ids%5B%5D=${selected?.id}&encoding=hex`;
     const chainLinkUrl = `https://min-api.cryptocompare.com/data/pricemultifull?fsyms=${selected?.fsyms}&tsyms=${selected?.tsyms}`;
     const diaDataUrl = `https://api.diadata.org/v1/quotation/${selected?.fsyms}`;
-    setIsFetching(true)
+    setIsFetching(shouldLoad)
     
     try {
       const results = await Promise.allSettled([
@@ -317,9 +321,9 @@ const Result = () => {
 
   useEffect(() => {
     if (selected) {
-      getPriceFeedHandler();
+      getPriceFeedHandler(true);
       const interval = setInterval(() => {
-        getPriceFeedHandler();
+        getPriceFeedHandler(false);
       }, 60000); // Fetch data every minute
       return () => clearInterval(interval);
     }
@@ -327,11 +331,11 @@ const Result = () => {
 
   return (
     <>
-      {isfetching ? <CustomSkeleton /> : (
+      {isfetching ? <div className="my-mother xs-down-20"><CustomSkeleton /></div> : (
         <div className="my-mother">
           {error && <ErrorModal />}
           {image && (
-            <div className="my-col-4 top-3">
+            <div className="my-col-4  xs-12 xs-down-5 top-3">
               <div className="img-container">
                 <img src={image} alt="Coin" />
               </div>
@@ -339,19 +343,19 @@ const Result = () => {
           )}
           {aggregatedPrice && (
             <div className="my-col-8 down-2">
-              <div className="my-mother down-">
+              <div className="my-mother">
                 <span className="px20 InterSemiBol rad-30">{selected?.label}</span>
               </div>
-              <div className="my-mother down-3">
-                <span className="px50 InterSemiBold">
-                  <span>{`${symbol}` === 'USD' ? <span>$</span> : <span>{symbol}</span>} </span>
+              <div className="my-mother down-3 xs-down-2">
+                <span className="px50 xs-px40 InterSemiBold">
+                  <span>{`${symbol}` === 'USD' ? <span>$</span>:<span>{symbol}</span>}</span>
                   {formatNumber(aggregatedPrice)}
                 </span>
               </div>
-              <div className="my-mother down-3 xs-down-1 px10">
-                <span>Price computed from </span>
-                <span>{computedFrom.slice(0, 3).map((i, index) => (
-                  <span className="pd-5 bg-faded InterSemiBold rad-30 mg-10" key={index}>{i}</span>
+              <div className="my-mother xs-down-5 down-3 xs-down-1xs-px10  px10">
+                 <div className="hidden-l mg-10"><span className="px13 InterLight">Price computed from </span></div>
+                <span className="xs-12  my-mother down-3 xs-down-5">{computedFrom.map((i, index) => (
+                  <span className="pd-5 xs-px9  px10 bg-faded rad-30 mg-10 InterSemiBold" key={index}>{i}</span>
                 ))}</span>
               </div>
             </div>
@@ -363,6 +367,7 @@ const Result = () => {
 };
 
 export default Result;
+
 ```
 
 

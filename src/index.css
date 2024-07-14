@@ -4,6 +4,7 @@ body, html  {
   height: 100%;
   padding: 0;
   margin: 0;
+  line-height: 1.3;
   scroll-behavior: smooth;
   font-family:InterRegular;
   overflow-x: hidden;
@@ -108,14 +109,14 @@ nav .nav-links {
 }
 
 .active {
-  border: solid 1px rgb(0, 0, 0);
+  border: solid 1px rgba(0, 0, 0, 0.231);
   transition: .3s ease-in-out;
   color: rgb(0, 0, 0) !important;
-  background-color:rgba(0, 0, 0, 0.205);
+  background-color:#f0f0f0;
 }
 
 .my-b-shadow {
-  box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 16px rgba(0, 0, 0, 0.3);
 }
 
 .img-container {
@@ -132,7 +133,7 @@ nav .nav-links {
 }
 
 .css-13cymwt-control {
-  background-color:rgba(0, 0, 0, 0.205) !important;
+  background-color:#f0f0f0 !important;
   border-radius: 30px !important;
 }
 .css-t3ipsp-control {
@@ -208,6 +209,7 @@ nav .nav-links {
   padding: 5px;
  }
 
+ 
 
  .my-modal {
   width: 100%;

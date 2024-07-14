@@ -248,6 +248,7 @@ body {
  .hidden-ls{
    display: none !important; 
  } 
+
  .ls-pd-10 {
   padding-bottom: 10px !important;   
  }
@@ -675,6 +676,26 @@ body {
 
 
 @media(max-width:759px){
+  .hidden-xs {
+    display: none;
+  }
+  .img-container {
+    display: inline-block !important;
+    width: 150px !important;
+    height: 150px !important;
+  }
+  .img-container  img {
+    /* object-fit: cover !important; */
+  }
+  .h-300 {
+    height: 350px !important;
+  }
+  .xs-container {
+    width: 92%;
+    margin-left: 4%;
+    position: relative;
+    float: left;
+  }
  .xs-px100 {
   font-size: 10.0rem !important;   
  }
