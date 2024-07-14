@@ -12,9 +12,8 @@ This Oracle Aggregator is a React-based application that fetches and aggregates 
 
 # See Demo
 
-Site link - ```link 
-https://oracle-aggregator.netlify.app
-```
+Site link - https://oracle-aggregator.netlify.app
+Video demo - https://youtube.com/76765454
 
 ## Getting Started
 
