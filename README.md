@@ -13,7 +13,7 @@ This Oracle Aggregator is a React-based application that fetches and aggregates 
 # See Demo
 
 - Site link - https://oracle-aggregator.netlify.app
-- Video demo - https://youtube.com/76765454
+- Video demo - https://www.loom.com/share/209d19e89c144cd3ad0f89e828231bcb
 
 ## Getting Started
 
@@ -52,7 +52,8 @@ yarn dev
 ```
 
 # Deployment
-Deploying to Vercel
+
+### 1. Deploying to Vercel
 
 1. Install the Vercel CLI:
 
@@ -68,7 +69,7 @@ vercel
 
 Follow the prompts to link or create a new Vercel project. Your application will be deployed and you will receive a URL for your live application.
 
-# Deploying to Cloudflare Pages
+### 2. Deploying to Cloudflare Pages
 
 1. Install the Cloudflare CLI:
 
@@ -78,21 +79,17 @@ npm install -g wrangler
 
 2. Authenticate with Cloudflare:
 
-
 ```bash
 wrangler login
 ```
 
-
 3. Configure your project:
-
 
 ```bash
 wrangler init
 ```
 
 Edit the wrangler.toml file with your project settings
-
 
 4. Build and deploy the application:
 
@@ -101,11 +98,10 @@ npm run build
 wrangler pages publish build
 ```
 
-
 # Usage
 
 - Select an asset from the dropdown to view its aggregated price.
-- The application will fetch price feeds from Pyth Network and Chainlink, aggregate them, and display the result.
+- The application will fetch price feeds from Pyth Network, Chainlink and Diadata Oracles, aggregate them, and display the result.
 - The price is refreshed every minute to ensure accuracy.
 
 
@@ -152,7 +148,6 @@ const Aggregator = () => {
       <div className="my-mother">
         <span onClick={()=> {setAssetType('crypto')}} className={`px12 c-pointer btn faded  pd-10 bg-faded rad-30 ${assetType == 'crypto' && 'active'}` }>Crypto</span>
         <span onClick={()=> {setAssetType('fx')}} className={`px12 c-pointer btn faded  pd-10 bg-faded mg-10 rad-30 ${assetType == 'fx' && 'active'}`}>Fx</span>
-
       </div>
     </> );
 }
@@ -367,7 +362,6 @@ const Result = () => {
 };
 
 export default Result;
-
 ```
 
 
