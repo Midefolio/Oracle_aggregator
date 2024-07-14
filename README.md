@@ -17,7 +17,7 @@ Site links:
 - https://oracle-aggregator.netlify.app (Netlify)
   
 Video:
-- Video demo - https://www.loom.com/share/209d19e89c144cd3ad0f89e828231bcb
+- [Video demo - https://www.loom.com/share/209d19e89c144cd3ad0f89e828231bcb](https://www.loom.com/share/528d85ec7a5740aa81f25c646d3f1eb4)
 
 ## Getting Started
 
