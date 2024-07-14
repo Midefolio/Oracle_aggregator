@@ -9,7 +9,10 @@ body, html  {
   font-family:InterRegular;
   overflow-x: hidden;
 }
- 
+.top-bd {
+  border-top: 1px solid #f3f3f3;
+  padding-top: 10px;
+}
 a {
   text-decoration: unset !important;
 }
@@ -128,8 +131,8 @@ nav .nav-links {
 .img-container img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: left;
+  object-fit:contain ;
+  /* object-position: left; */
 }
 
 .css-13cymwt-control {

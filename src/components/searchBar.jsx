@@ -24,10 +24,12 @@ const MenuList = (props) => {
 
 const SearchBar = () => {
   const { asset, selected, setSelected } = useContext(UtilsContext);
-
+  console.log(asset)
   useEffect(() => {
     if (asset) {
-      const init = asset ? asset[0] : null;
+      let init;
+      const gsol = asset.find(i => i.label === 'SOLUSD');
+      gsol? init = gsol : init = asset[0]
       if (init) {
         setSelected(init);
       }
