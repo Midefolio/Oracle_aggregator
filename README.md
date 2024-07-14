@@ -12,7 +12,11 @@ This Oracle Aggregator is a React-based application that fetches and aggregates 
 
 # See Demo
 
-- Site link - https://oracle-aggregator.netlify.app
+Site links:
+- https://oracle-aggregator-ten.vercel.app (Vercel)
+- https://oracle-aggregator.netlify.app (Netlify)
+  
+Video:
 - Video demo - https://www.loom.com/share/209d19e89c144cd3ad0f89e828231bcb
 
 ## Getting Started
@@ -219,7 +223,6 @@ The Result component fetches price data from Pyth Network and Chainlink, aggrega
 
 ```jsx
 import { useContext, useEffect, useState } from "react";
-import useApi from "../hook/useApi";
 import { UtilsContext } from "../context/utilsContext";
 import useUtils from "../utils/useutils";
 import CustomSkeleton from "./skeleton";
@@ -235,6 +238,7 @@ const Result = () => {
   const [symbol, setSymbol] = useState(null)
   const [computedFrom, setComputedFrom] = useState([])
   const [error, setError] = useState(false)
+  const [prices, setPrices] = useState ([])
 
   useEffect(() => {
     if (selected) {
@@ -278,7 +282,7 @@ const Result = () => {
         pythPrice = parseFloat(priceData.price) * Math.pow(10, priceData.expo);
         totalPrice += pythPrice;
         count++;
-        computedFrom.push("Pyth Network");
+        computedFrom.push({name:"Pyth Network", price:pythPrice});
       }
 
       // Extract ChainLink price feed
@@ -286,7 +290,7 @@ const Result = () => {
         chainLinkPrice = chainLinkResult.value.data.RAW[selected.fsyms][selected.tsyms].PRICE;
         totalPrice += chainLinkPrice;
         count++;
-        computedFrom.push("Chainlink");
+        computedFrom.push({name:"ChainLink", price:chainLinkPrice});
         setImage('https://www.cryptocompare.com/' + chainLinkResult.value.data.RAW[selected?.fsyms][selected?.tsyms]['IMAGEURL']);
       }
 
@@ -295,7 +299,7 @@ const Result = () => {
         diaPrice = parseFloat(diaResult.value.data.Price);
         totalPrice += diaPrice;
         count++;
-        computedFrom.push("Diadata");
+        computedFrom.push({name:"Diadata", price:diaPrice});
       }
 
       if (count < 1) {
@@ -334,24 +338,30 @@ const Result = () => {
               <div className="img-container">
                 <img src={image} alt="Coin" />
               </div>
+                <div className="hidden-l mg-10"><span className="px13">Price Updates every 60s </span></div>
             </div>
           )}
           {aggregatedPrice && (
-            <div className="my-col-8 down-2">
+            <div className="my-col-7 off-1 down-2">
               <div className="my-mother">
-                <span className="px20 InterSemiBol rad-30">{selected?.label}</span>
+                {/* <span className="px20 InterSemiBol rad-30">{selected?.label}</span> */}
+                <div className="my-mother down-3 xs-down-2">
+                  {computedFrom.map((i, index) => (
+                  <div className="my-col-4 xs-4" key={index}>
+                    <div className="container px10  " >{i.name} Price:</div>
+                    <div className="container down-3 InterSemiBold px12" >${formatNumber(i.price)}</div>
+                  </div>
+                  ))}
+                </div>
               </div>
               <div className="my-mother down-3 xs-down-2">
-                <span className="px50 xs-px40 InterSemiBold">
+                <div className="my-mother top-bd"><span className="px12 InterLight">Aggregate Price for <b>{selected?.label}</b></span></div>
+                <span className="px50 xs-px40 my-mother InterSemiBold">
                   <span>{`${symbol}` === 'USD' ? <span>$</span>:<span>{symbol}</span>}</span>
                   {formatNumber(aggregatedPrice)}
                 </span>
               </div>
-              <div className="my-mother xs-down-5 down-3 xs-down-1xs-px10  px10">
-                 <div className="hidden-l mg-10"><span className="px13 InterLight">Price computed from </span></div>
-                <span className="xs-12  my-mother down-3 xs-down-5">{computedFrom.map((i, index) => (
-                  <span className="pd-5 xs-px9  px10 bg-faded rad-30 mg-10 InterSemiBold" key={index}>{i}</span>
-                ))}</span>
+              <div className="my-mother xs-down-5 down-1 xs-down-1xs-px10  px10">
               </div>
             </div>
           )}
